@@ -1,4 +1,4 @@
-# Stream
+# IO Stream
 
 Stream is nothing but a connection between java program and data source
 
@@ -24,11 +24,51 @@ Streams are classified into two category:
 ## Buffering
 
 - Buffer is byte array
-- By default, read and write operation only consider one byte. Reading/Writing one byte at time can 
-  be costly. Instead of considering ony byte we can use a buffer **(A block of byte)** to make 
+- By default, read and write operation only consider one byte. Reading/Writing only one byte at time 
+  from disk is costly. Instead of considering ony byte we can use a buffer **(A block of byte)** 
+  to make 
   read and write operation efficient and faster
 - BufferedInputStream and BufferedOutputStream must be chained with FileInputStream and 
-  FileOutputStream as they only provide buffering but not provide stream
+  FileOutputStream as they only provide buffering but not provide stream. This is a example of 
+  **Decorator Pattern**
+- Default buffer size = 8192 bytes
+
 ```java
 BufferedInputStream in = new BufferedInputStream(new FileInputStream("profile.jpg"));
 ```
+Here BufferedInputStream is a decorator for FileInputStream object.
+>Note: BufferedInputStream and FileInputStream class must have common Super class(e.g. InputStream)
+
+**Without buffer**
+```java
+// Create stream
+fileInputStream = new FileInputStream(inputFileName);
+fileOutputStream = new FileOutputStream(outputFileName);
+
+int byteRead = fileInputStream.read();
+
+while (byteRead != -1) {
+    fileOutputStream.write(byteRead);
+    byteRead = fileInputStream.read();
+}
+```
+> **Output**: Elapsed time: 491.3693 milliseconds
+
+**Optimized using buffer**
+```java
+// Create stream
+bufferedInputStream =
+        new BufferedInputStream(new FileInputStream(inputFileName));
+bufferedOutputStream =
+        new BufferedOutputStream(new FileOutputStream(outputFileName));
+
+byte[] bytesRead = new byte[4000];
+int numOfBytesRead = bufferedInputStream.read(bytesRead);
+
+while (numOfBytesRead != -1) {
+    bufferedOutputStream.write(bytesRead, 0, numOfBytesRead);
+    numOfBytesRead = bufferedInputStream.read(bytesRead);
+}
+```
+
+>**Output**: Elapsed time: 0.6456 milliseconds
