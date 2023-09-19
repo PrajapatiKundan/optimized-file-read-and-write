@@ -72,3 +72,68 @@ while (numOfBytesRead != -1) {
 ```
 
 >**Output**: Elapsed time: 0.6456 milliseconds
+
+## try-with-resource
+
+```java
+BufferedInputStream bufferedInputStream = null;
+BufferedOutputStream bufferedOutputStream = null;
+
+try {
+
+    // Create stream
+    bufferedInputStream = new BufferedInputStream(new FileInputStream(inputFileName));
+    bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(outputFileName));
+
+    byte[] bytesRead = new byte[4000];
+    int numOfBytesRead = bufferedInputStream.read(bytesRead);
+
+    while (numOfBytesRead != -1) {
+        bufferedOutputStream.write(bytesRead, 0, numOfBytesRead);
+        numOfBytesRead = bufferedInputStream.read(bytesRead);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+} finally {
+    try {
+        if (bufferedInputStream != null)
+            bufferedInputStream.close();
+
+        if (bufferedOutputStream != null)
+            bufferedOutputStream.close();
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
+
+The **finally** block in above snippet looks ugly like we are using null check and another try...
+catch to hande the exception that can be thrown by close() method.
+
+To make this code more readable and reduce verbose **try-with-resources** become useful
+
+**This is how the code can be optimized with try-with-resources**
+
+```
+try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(inputFileName));
+     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(outputFileName))) {
+    byte[] bytesRead = new byte[4000];
+    int numOfBytesRead = bufferedInputStream.read(bytesRead);
+
+    while (numOfBytesRead != -1) {
+        bufferedOutputStream.write(bytesRead, 0, numOfBytesRead);
+        numOfBytesRead = bufferedInputStream.read(bytesRead);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+} 
+```
+
+- The resources are created within the parenthesis followed by try keyword
+- The resources created in the parenthesis are implicitly **final**(final bufferedInputStream, 
+  final bufferedOutputStream). We can not reassign new value to them later.
+- The close() method is called implicitly. No need to invoke in finally block. This feature of 
+  java is called **ARM(Automatic Resource Management)**
+- When the try block is completed the resources will be closed in reverse order. 
+  bufferedOutputStream will be closed first and then bufferedInputStream will be closed
+- Any resource that we create within parenthesis must be of type **AutoCloseable(An Interface)**

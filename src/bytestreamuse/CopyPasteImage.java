@@ -15,13 +15,8 @@ public class CopyPasteImage {
         // Measure performance
         long startTime, elapsedTime;
 
-        // Create streams
-        FileInputStream fileInputStream = null;
-        FileOutputStream fileOutputStream = null;
-
-        try {
-            fileInputStream = new FileInputStream(inputFileName);
-            fileOutputStream = new FileOutputStream(outputFileName);
+        try (FileInputStream fileInputStream = new FileInputStream(inputFileName);
+             FileOutputStream fileOutputStream = new FileOutputStream(outputFileName)) {
 
             startTime = System.nanoTime();
 
@@ -37,19 +32,6 @@ public class CopyPasteImage {
             System.out.println("Elapsed time: " + (elapsedTime / 1000000.0) + " milliseconds");
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-
-            // TODO: This can be optimized with try-with-resource block
-
-            try {
-                if (fileInputStream != null)
-                    fileInputStream.close();
-
-                if (fileOutputStream != null)
-                    fileOutputStream.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -62,16 +44,10 @@ public class CopyPasteImage {
         // Output file name
         String outputFileName = "wallpaper_copy_with_buffer.jpg";
 
-        // Create stream
-        BufferedInputStream bufferedInputStream = null;
-        BufferedOutputStream bufferedOutputStream = null;
-
-        try {
-            // Create stream
-            bufferedInputStream =
+        try (BufferedInputStream bufferedInputStream =
                     new BufferedInputStream(new FileInputStream(inputFileName));
-            bufferedOutputStream =
-                    new BufferedOutputStream(new FileOutputStream(outputFileName));
+             BufferedOutputStream bufferedOutputStream =
+                    new BufferedOutputStream(new FileOutputStream(outputFileName))) {
 
             startTime = System.nanoTime();
 
@@ -88,19 +64,6 @@ public class CopyPasteImage {
             System.out.println("Elapsed time: " + (elapsedTime / 1000000.0) + " milliseconds");
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-
-            // TODO: This can be optimized with try-with-resource block
-
-            try {
-                if (bufferedInputStream != null)
-                    bufferedInputStream.close();
-
-                if (bufferedOutputStream != null)
-                    bufferedOutputStream.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
